@@ -13,6 +13,6 @@ Expect stubs labeled until real gen/judge keys are set. JudgeProvider stays park
 
 ## Smoke
 
-**PASS** (2026-09-18, local `npm run dev`): `/` → **Enter the Arena** → briefing (Nova vs Synergy, before cottage still) → one spellbook + 90s timer → Cast · ship it → stubbed gen → reveal Nova | after | Synergy mock (illustrations paint) → astral-board theater → stub scores → winner. No second prompt UI. No live LLM.
+**PASS** (2026-09-18, local `npm run dev`): `/` → **Enter the Arena** → briefing (Nova vs Synergy, **Before** + **Target after**, riddle hints cottage → crystalline wizard tower at dusk) → one spellbook + 90s timer; Synergy status-only (still casting → after ~10s foe hath moved) → Cast · ship it → stubbed gen → reveal professor Before | Target after, then Nova, then Synergy mock. No second prompt UI. No live LLM.
 
 Previous two-spell same-browser UI is gone.
