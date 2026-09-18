@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="Stub output A: a gothic stone tower with a crystal cap">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" role="img" aria-label="Stub output A: a gothic stone tower with a crystal cap">
   <defs>
     <linearGradient id="sasky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#1c2038"/>
@@ -20,5 +21,5 @@
     <rect x="28" y="120" width="16" height="40" fill="#4d5468"/>
     <rect x="136" y="120" width="16" height="40" fill="#4d5468"/>
   </g>
-  <text x="40" y="560" fill="#efe6d8" font-size="18" font-family="Georgia, serif" opacity="0.7">STUB GEN A · stone keep, crystal hat</text>
+  <text x="40" y="560" fill="#efe6d8" font-size="18" font-family="Georgia, serif" opacity="0.7">STUB GEN A â€” stone keep, crystal hat</text>
 </svg>

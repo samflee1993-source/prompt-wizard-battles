@@ -4,17 +4,18 @@ Machine-friendly notes for a vaporware happy-path demo. Prefer stubbing expensiv
 
 ## Goal / DoD
 
-Public URL that clicks through: **landing → duel → parallel casting wait → score → funny winner**.  
+Public URL that clicks through: **landing → duel → one-spell 90s wait → score → funny winner**.  
 Happy path once is enough. No deep QA.
 
 ## Product lock
 
-- Both players = wizards.
+- Demo player **is Wizard A only**: **Nova Shipwright** (indigo cloak, rocket-wand). Tagline: ships the spell, not the deck.
+- Opponent is a pretend rival, not a second player: **Synergy the Soft-Committed** (orange corporate salamander, standup sticky as staff). Name + avatar only — no Wizard B inputs / second spell field.
 - Same **before** media + **riddle** (hints at prompt method behind real **after**).
-- Each submits **one spell** (prompt).
-- Gens run **in parallel**; wait animation loops.
-- Score = **50% deterministic** match-to-after + **50% personality LLM-judge** rubric.
-- Announce winning wizard + short funny congrats.
+- Nova submits **one spell** on a **90-second countdown**; auto-cast at 0 or Cast on submit, whichever first.
+- Nova’s gen is stubbed (`stub-out-a.svg`). Synergy’s compare image is a **canned mock** at `/duel/pool/rival-mock.png` (SVG `stub-out-b.svg` fallback). Not from a second prompt.
+- Score = **50% deterministic** match-to-after + **50% personality LLM-judge** rubric (stub judge; no live LLM). Winner can still be Nova or Synergy from scores.
+- Announce winning wizard + short spicy SaaSy congrats.
 - Out of scope: brand system, CI matrices, features beyond this loop.
 
 ## Stack (as implemented)
@@ -23,7 +24,7 @@ Happy path once is enough. No deep QA.
 |-------|--------|-----|
 | App | Next.js 15 App Router (TypeScript) | Fast to host; API routes for gen/judge stubs |
 | Host | Vercel free tier from GitHub | Public URL without paid APIs for stubs |
-| Media | Approved landing PNGs in `/public/landing/` + canned duel SVGs | Swap gen/judge later |
+| Media | Approved landing PNGs + duel before/after/rival-mock stills (SVG stubs as fallback) | Swap gen/judge later |
 | State | Client step machine + one duel session id | No DB for POC |
 
 Repo: `samflee1993-source/prompt-wizard-battles`.
@@ -41,25 +42,25 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
     duel/page.tsx           # duel step machine
     api/cast/route.ts       # POST /api/cast
     api/score/route.ts      # POST /api/score
-  components/               # StubBadge, CastingWait, MediaFrame, ScoreMeter
+  components/               # StubBadge, CastingWait, MediaFrame, ScoreMeter, WizardPortrait, AstralBoard
   lib/
     gen/                    # ImageGenProvider interface + StubImageGen
     judge/                  # JudgeProvider interface + StubPersonalityJudge
     score/                  # deterministicSimilarity + combineScores
-    duel/                   # canned duel pack, session type, congrats
+    duel/                   # canned duel pack, session type, congrats, wizard roster
   public/
     landing/                # approved banners + index.html + HANDOFF.md
-    duel/                   # before.svg, after.svg, stub-out-a.svg, stub-out-b.svg
+    duel/                   # before.png, after.png, SVG stubs, pool/rival-mock.png
 ```
 
 ## UI flow (steps)
 
 1. **Landing** (`/`) — approved banners in page order; CTAs “Enter the Arena” → `/duel`.
-2. **Duel briefing** (`/duel`) — before media + riddle (shared).
-3. **Spell input** — Wizard A + Wizard B each one prompt (side-by-side).
-4. **Casting** — wait animation; fire two gen calls in parallel (`Promise.all`).
-5. **Reveal** — Wizard A output | true after | Wizard B output.
-6. **Score** — show split: deterministic / judge / total.
+2. **Duel briefing** (`/duel`) — Nova vs Synergy portraits, before media + riddle (shared).
+3. **Spell input** — Nova only (90s timer). Synergy is a locked rival card.
+4. **Casting** — wait animation; one gen call for Nova. Rival still is canned.
+5. **Reveal** — Nova output | true after | Synergy mock.
+6. **Score** — theatrical “consulting the astral board” (meters hunt, quips cycle), then stub/deterministic totals. No live LLM.
 7. **Winner** — wizard name + funny congrats line.
 
 Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing is approved visual SoT (not a stub). Duel UI reuses that palette, pill CTAs, and playful wizard tone.
@@ -69,14 +70,14 @@ Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing is 
 ```
 [Landing CTA]
     → load DuelPack { beforeUrl, afterUrl, riddle, hintMethod, targetKeywords }
-    → user spells { wizardA, wizardB }
-    → Promise.all([ gen.cast(before, spellA, seed a), gen.cast(before, spellB, seed b) ])
-    → outputs { outA, outB }
+    → player spell { wizardA = Nova }  (90s auto-cast or submit)
+    → gen.cast(before, spellA, seed a)
+    → outputs { outA, outB = canned rival mock }
     → detA = deterministicSimilarity(spellA, targetKeywords)
-    → detB = deterministicSimilarity(spellB, targetKeywords)
-    → judge = judge.score({ before, after, outA, outB, spells, riddle })
+    → detB = deterministicSimilarity(cannedRivalSpell, targetKeywords)
+    → judge = judge.score({ before, after, outA, outB, spells, riddle })  // stub
     → total = round(0.5 * det + 0.5 * judge.personality)  (per wizard)
-    → winner = argmax(total); tie-break higher det, then Wizard A
+    → winner = argmax(total); tie-break higher det, then Nova
     → congrats = funnyLine(winner)
 ```
 
@@ -124,8 +125,8 @@ export interface JudgeProvider {
 }
 ```
 
-**Stub gen:** ignore spell semantics; return canned `stub-out-a.svg` / `stub-out-b.svg` after a short delay (seed `a`/`b`; ~1200ms / ~1550ms so `Promise.all` waits on max, not sum).  
-**Stub judge:** persona “Archmage Snark” (overridable via `JUDGE_PERSONA`); hash prompt+urls into stable 0–100 rubric buckets (theatricality, cunning, resemblance, panache) + witty one-liner.  
+**Stub gen:** ignore spell semantics; return canned `stub-out-a.svg` after a short delay for Nova only. Synergy’s reveal image is `/duel/pool/rival-mock.png` (strong-ish canned still; SVG fallback), not a second `/api/cast`.  
+**Stub judge:** persona “Archmage Snark” (overridable via `JUDGE_PERSONA`); hash prompt+urls into stable 0–100 rubric buckets (theatricality, cunning, resemblance, panache) + witty one-liner. No live LLM.  
 **Deterministic:** lexical overlap of the wizard’s spell against `pack.targetKeywords` (the hidden prompt-method the riddle hints at), mapped to ~14–98. Pure function in `lib/score/deterministic.ts`. Pixel/histogram distance was skipped because placeholder SVGs would barely move the score with user input.
 
 ## Scoring split
@@ -135,7 +136,7 @@ export interface JudgeProvider {
 | Deterministic | 0.5 | `deterministicSimilarity(spell, targetKeywords) → 0..100` | CLIP / LPIPS / embedding cosine vs after |
 | Personality judge | 0.5 | StubPersonalityJudge rubric | LLM agent with fixed persona + rubric JSON schema |
 
-`total = round(0.5 * det + 0.5 * judge)`. Tie-break: higher deterministic, then Wizard A.
+`total = round(0.5 * det + 0.5 * judge)`. Tie-break: higher deterministic, then Nova.
 
 ## Env vars / secrets
 
@@ -155,9 +156,9 @@ Never commit `.env`. Empty `.env.example` lists the keys above. Unwired non-stub
 | Piece | POC | Real later |
 |-------|-----|------------|
 | Landing visuals | Approved banners (`hero-v1` … `cta-v1`, `learn-fun-v2`) | Optional HTML typography instead of image copy |
-| Before / after / stub outs | Static SVG in `/public/duel` | Real pack assets / CDN |
+| Before / after / stub outs | `before.png` / `after.png` / `pool/rival-mock.png`; SVG stubs fallback | Real pack assets / CDN |
 | Image gen | `StubImageGen` | Provider behind `ImageGenProvider` |
-| Judge | `StubPersonalityJudge` | LLM + rubric agent |
+| Judge | `StubPersonalityJudge` + theatrical astral-board animation | LLM + rubric agent |
 | Deterministic score | Lexical overlap vs target keywords | Embedding / perceptual metric |
 | Wait animation | CSS loop in duel UI | Optional Lottie |
 | Persistence | None | Optional session store |
@@ -180,11 +181,11 @@ Visual system (source of truth for landing **and** duel UI): dark purple `#14081
 
 ## Smoke (once)
 
-1. Open `/` → see landing CTA  
-2. Enter duel → before + riddle visible  
-3. Submit two spells → casting animation  
-4. See both outs vs after, split scores, winner + funny line  
-5. Confirm stub badges visible  
+1. Open `/` → see landing CTA → `/duel`  
+2. Enter duel → Nova vs Synergy, before + riddle visible  
+3. Submit one Nova spell (or wait 90s) → casting animation  
+4. See Nova | after | rival mock, split scores, winner + funny line  
+5. Confirm stub badges visible; no second prompt UI  
 
 Record pass/fail in `DEMO.md`.
 

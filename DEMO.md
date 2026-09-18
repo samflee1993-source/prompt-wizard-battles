@@ -2,22 +2,17 @@
 
 1. Open the public URL (or `npm run dev` locally).
 2. Landing: skim approved banners (hero → how it works → learn-fun-v2 → duel tease → judge tease → cta) → click **Enter the Arena** (nav, image CTA, or `#enter` pill).
-3. Briefing: note before image + riddle.
-4. Enter Wizard A’s spell → Wizard B’s spell → **Cast**.
-5. Wait: casting animation in the **duel UI** while both gens resolve (parallel).
-6. Results: A output | true after | B output.
-7. Scores: deterministic + judge + totals; stub badges if stubs on.
-8. Winner: wizard name + funny congrats.
+3. Briefing: you are **Nova Shipwright** (indigo cloak, rocket-wand) vs pretend rival **Synergy the Soft-Committed** (orange salamander, standup sticky). Note cinematic **before.png** cottage + riddle. No Wizard B inputs anywhere.
+4. Spell: **one** ornate spellbook field for Nova only. Synergy is name + avatar + wax “HOLD” — not controllable. 90-second countdown. **Cast · ship it** or wait for auto-cast at 0.
+5. Wait: casting animation in the **duel UI** while Nova’s stub gen resolves. Rival output is `/duel/pool/rival-mock.png` (canned, not a second prompt).
+6. Results: Nova output | true after (`after.png`) | Synergy mock.
+7. Scores: **consulting the astral board** theater (hunting meters, cycling persona quips, rubric runes). Then stub/deterministic totals fill in. Stub badges stay on. **No live LLM.** Winner can still be Nova or Synergy from scores.
+8. Winner: wizard name + spicy Grok × SaaSy congrats.
 
-Expect stubs labeled until real gen/judge keys are set.
+Expect stubs labeled until real gen/judge keys are set. JudgeProvider stays parked on the stub.
 
 ## Smoke
 
-**PASS** (2026-09-18, local `npm run dev`, pre-landing-swap): briefing → two spells → casting (`stubbed gen`) → reveal A|after|B → scores (`stubbed gen` + `stubbed judge`, A 67 vs B 37) → winner Wizard A, “Please do not let this go to your hat.”
+**PASS** (2026-09-18, local `npm run dev`): `/` → **Enter the Arena** → briefing (Nova vs Synergy, before cottage still) → one spellbook + 90s timer → Cast · ship it → stubbed gen → reveal Nova | after | Synergy mock (illustrations paint) → astral-board theater → stub scores → winner. No second prompt UI. No live LLM.
 
-Landing swap + visual SoT follow in this PR; re-click `/` → **Enter the Arena** after deploy.
-
-## Live demo (ephemeral tunnel)
-
-- Public: https://meet-net-villa-weed.trycloudflare.com (Cloudflare quick tunnel; no card; dies when tunnel/box stops)
-- Local: `npm run build && npm run start` → http://localhost:3000
+Previous two-spell same-browser UI is gone.
