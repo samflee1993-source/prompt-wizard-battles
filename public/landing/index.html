@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompt Wizard Battles</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #14081f;
+      --ink: #f5f0ff;
+      --muted: #c9b8e8;
+      --accent: #f5d76e;
+      --button: #e8d4ff;
+      --button-ink: #2a1840;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    header.site {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(10, 4, 18, 0.85);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .logo span { color: var(--accent); }
+    a.nav-cta {
+      display: inline-block;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: var(--button);
+      color: #2a1840;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    main { width: 100%; }
+    section.block {
+      width: 100%;
+      display: block;
+    }
+    section.block img {
+      display: block;
+      width: 100%;
+      height: auto;
+      vertical-align: top;
+    }
+    .live-cta {
+      display: flex;
+      justify-content: center;
+      padding: 1.25rem 1rem 2.5rem;
+      background: linear-gradient(180deg, #1a0b2a 0%, #0d0615 100%);
+    }
+    .live-cta a {
+      display: inline-block;
+      padding: 0.9rem 1.6rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f5d76e, #e8d4ff);
+      color: #2a1840;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.05rem;
+      box-shadow: 0 0 24px rgba(245, 215, 110, 0.35);
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="logo">Prompt <span>Wizard</span> Battles</div>
+    <a class="nav-cta" href="/duel">Enter the Arena</a>
+  </header>
+
+  <main>
+    <section class="block" id="hero" aria-label="Hero">
+      <a href="/duel" aria-label="Enter the Arena">
+        <img src="hero-v1.png" alt="Prompt Wizard Battles — duel with prompts, laugh at the verdict" />
+      </a>
+    </section>
+
+    <section class="block" id="how-it-works" aria-label="How it works">
+      <img src="how-it-works-v1.png" alt="How it works: get the riddle, cast your prompt, wait for the sparks, judge picks a winner" />
+    </section>
+
+    <section class="block" id="learn" aria-label="Learn by laughing">
+      <img src="learn-fun-v2.png" alt="Learn by laughing — watch the professor's transformation spell, then replicate it with your own prompt" />
+    </section>
+
+    <section class="block" id="duel" aria-label="The Duel">
+      <img src="duel-tease-v1.png" alt="The Duel — same riddle, two spells, parallel generation" />
+    </section>
+
+    <section class="block" id="judge" aria-label="The Judge">
+      <img src="judge-tease-v1.png" alt="The Judge — personality LLM, half-deterministic, fully ridiculous" />
+    </section>
+
+    <section class="block" id="cta" aria-label="Call to action">
+      <a href="/duel" aria-label="Enter the Arena">
+        <img src="cta-v1.png" alt="Ready to cast? Enter the Arena" />
+      </a>
+    </section>
+
+    <div class="live-cta" id="enter">
+      <a href="/duel">Enter the Arena</a>
+    </div>
+  </main>
+
+  <footer>
+    Prompt Wizard Battles · POC landing · visual blocks approved for demo wiring
+  </footer>
+</body>
+</html>

@@ -121,7 +121,7 @@ export function DuelClient() {
   return (
     <div className="duel-shell">
       <header className="duel-top">
-        <p className="eyebrow">Prompt Wizard Battles · POC</p>
+        <p className="eyebrow">Same riddle. Two spells. Parallel generation.</p>
         <h1>{pack.title}</h1>
         <ol className="stepper" aria-label="Duel steps">
           {STEPS.map((s, i) => (
@@ -147,9 +147,10 @@ export function DuelClient() {
       {step === "briefing" ? (
         <section className="panel">
           <div className="panel-head">
-            <h2>The riddle of the after</h2>
+            <h2>Get the riddle</h2>
             <p className="lede">
-              Same before. Same riddle. Two wizards. One spell each.
+              Watch the before. Read the riddle. Then replicate the hidden
+              transformation with your own prompt — learn by laughing.
             </p>
           </div>
           <div className="brief-grid">
@@ -175,10 +176,10 @@ export function DuelClient() {
       {step === "spells" ? (
         <section className="panel">
           <div className="panel-head">
-            <h2>Speak one spell each</h2>
+            <h2>Cast your prompt</h2>
             <p className="lede">
-              The riddle still hangs in the air. Do not peek at the after —
-              that is the whole sport.
+              One spell each. Do not peek at the after — that is the whole
+              sport. Closest match wins bragging rights.
             </p>
           </div>
           <blockquote className="riddle compact">
@@ -230,7 +231,7 @@ export function DuelClient() {
       {step === "casting" ? (
         <section className="panel">
           <div className="panel-head">
-            <h2>The circle holds</h2>
+            <h2>Wait for the sparks</h2>
             <div className="badge-row">
               <StubBadge kind="gen" />
             </div>
@@ -242,7 +243,7 @@ export function DuelClient() {
       {step === "reveal" && session ? (
         <section className="panel">
           <div className="panel-head">
-            <h2>Both outputs vs true after</h2>
+            <h2>Cast. Wait. Compare.</h2>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
             </div>
@@ -282,10 +283,10 @@ export function DuelClient() {
       {step === "score" && session && judgeDetail ? (
         <section className="panel">
           <div className="panel-head">
-            <h2>Split scores</h2>
+            <h2>The Judge</h2>
             <p className="lede">
-              50% deterministic lexical match to the hidden method · 50%{" "}
-              {judgeDetail.persona}
+              Personality LLM. Half-deterministic. Fully ridiculous — 50%
+              lexical match · 50% {judgeDetail.persona}.
             </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
@@ -355,7 +356,7 @@ export function DuelClient() {
       {step === "winner" && session && judgeDetail ? (
         <section className="panel winner-panel">
           <div className="panel-head">
-            <p className="eyebrow gold">The circle names a winner</p>
+            <p className="eyebrow gold">Funny verdict. No sacred cows.</p>
             <h2>{winnerName}</h2>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
@@ -376,7 +377,7 @@ export function DuelClient() {
               Duel again
             </button>
             <a className="btn primary" href="/">
-              Back to landing
+              Back to the banners
             </a>
           </div>
         </section>

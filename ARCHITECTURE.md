@@ -23,7 +23,7 @@ Happy path once is enough. No deep QA.
 |-------|--------|-----|
 | App | Next.js 15 App Router (TypeScript) | Fast to host; API routes for gen/judge stubs |
 | Host | Vercel free tier from GitHub | Public URL without paid APIs for stubs |
-| Media | Static SVG placeholders in `/public/duel/` | Swap Landing assets later |
+| Media | Approved landing PNGs in `/public/landing/` + canned duel SVGs | Swap gen/judge later |
 | State | Client step machine + one duel session id | No DB for POC |
 
 Repo: `samflee1993-source/prompt-wizard-battles`.
@@ -37,7 +37,7 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
   DEMO.md                   # click script + smoke note
   .env.example              # future provider keys
   app/                      # App Router UI + API
-    page.tsx                # landing (placeholder)
+    page.tsx                # landing (approved banners)
     duel/page.tsx           # duel step machine
     api/cast/route.ts       # POST /api/cast
     api/score/route.ts      # POST /api/score
@@ -48,13 +48,13 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
     score/                  # deterministicSimilarity + combineScores
     duel/                   # canned duel pack, session type, congrats
   public/
-    landing/                # placeholder until Landing handoff
+    landing/                # approved banners + index.html + HANDOFF.md
     duel/                   # before.svg, after.svg, stub-out-a.svg, stub-out-b.svg
 ```
 
 ## UI flow (steps)
 
-1. **Landing** (`/`) — placeholder blocks; CTA “Enter the duel”.
+1. **Landing** (`/`) — approved banners in page order; CTAs “Enter the Arena” → `/duel`.
 2. **Duel briefing** (`/duel`) — before media + riddle (shared).
 3. **Spell input** — Wizard A + Wizard B each one prompt (side-by-side).
 4. **Casting** — wait animation; fire two gen calls in parallel (`Promise.all`).
@@ -62,7 +62,7 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
 6. **Score** — show split: deterministic / judge / total.
 7. **Winner** — wizard name + funny congrats line.
 
-Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing uses `placeholder landing`.
+Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing is approved visual SoT (not a stub). Duel UI reuses that palette, pill CTAs, and playful wizard tone.
 
 ## Data flow
 
@@ -154,23 +154,29 @@ Never commit `.env`. Empty `.env.example` lists the keys above. Unwired non-stub
 
 | Piece | POC | Real later |
 |-------|-----|------------|
-| Landing visuals | Placeholder HTML/CSS | Approved Landing blocks + markup |
+| Landing visuals | Approved banners (`hero-v1` … `cta-v1`, `learn-fun-v2`) | Optional HTML typography instead of image copy |
 | Before / after / stub outs | Static SVG in `/public/duel` | Real pack assets / CDN |
 | Image gen | `StubImageGen` | Provider behind `ImageGenProvider` |
 | Judge | `StubPersonalityJudge` | LLM + rubric agent |
 | Deterministic score | Lexical overlap vs target keywords | Embedding / perceptual metric |
-| Wait animation | CSS loop | Optional Lottie from Landing |
+| Wait animation | CSS loop in duel UI | Optional Lottie |
 | Persistence | None | Optional session store |
 
-## Landing handoff (when ready)
+## Landing (wired)
 
-Expect from Landing / Orchestrator:
+Approved assets in `/public/landing/`, rendered by `app/page.tsx` in this order:
 
-1. Approved section images (paths or URLs)
-2. Minimal HTML/CSS (or section markup)
-3. Note: sizes + what still needs duel wiring
+1. `hero-v1.png` (image CTA → `/duel`)
+2. `how-it-works-v1.png`
+3. `learn-fun-v2.png` (do not ship v1)
+4. `duel-tease-v1.png`
+5. `judge-tease-v1.png`
+6. `cta-v1.png` (image CTA → `/duel`)
+7. Live `#enter` pill → `/duel`
 
-Wire into `/public/landing/` + landing route; keep duel routes unchanged.
+Nav **Enter the Arena** also goes to `/duel`. Wait-loop stays on the duel route.
+
+Visual system (source of truth for landing **and** duel UI): dark purple `#14081f`, ink `#f5f0ff`, muted `#c9b8e8`, accent gold `#f5d76e`, CTA pill `#e8d4ff` on `#2a1840`, sticky header, rounded pill CTAs, full-bleed section banners, playful wizard tone.
 
 ## Smoke (once)
 
