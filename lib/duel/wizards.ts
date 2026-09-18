@@ -23,5 +23,8 @@ export const RIVAL = {
 
 export const SPELL_SECONDS = 90;
 
+/** Status-only fake beat for Synergy on the spell step. No opponent input. */
+export const RIVAL_CAST_SECONDS = 10;
+
 export const EMPTY_SPELL_FALLBACK =
   "(silence — the 90 seconds shipped without a prompt)";

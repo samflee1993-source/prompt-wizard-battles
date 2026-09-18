@@ -368,6 +368,11 @@ code {
   align-self: center;
 }
 
+.brief-riddle {
+  margin-top: 16px;
+  align-self: stretch;
+}
+
 .riddle p {
   font-style: italic;
   font-size: 1.18rem;
@@ -534,6 +539,19 @@ code {
   letter-spacing: 0;
   text-transform: none;
   font-weight: 500;
+}
+
+.rival-status {
+  margin: 4px 0 0;
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.04em;
+  font-size: 1.02rem;
+  line-height: 1.35;
+  color: var(--accent);
+}
+
+.rival-card.is-casting .rival-status {
+  color: #ffb08a;
 }
 
 .rival-lock {
@@ -1040,6 +1058,16 @@ textarea:focus {
   transform: rotate(-8deg);
 }
 
+.rival-card.is-casting .wax-seal {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.rival-card.is-moved .wax-seal {
+  background:
+    radial-gradient(circle at 35% 30%, #ffe08a, #c9a21a 62%, #6a4e0c);
+  transform: rotate(6deg);
+}
+
 .astral-board {
   position: relative;
   margin-top: 18px;
@@ -1145,7 +1173,8 @@ textarea:focus {
   .casting-ring,
   .casting-glyph,
   .casting-core,
-  .spark {
+  .spark,
+  .rival-card.is-casting .wax-seal {
     animation: none !important;
     transition: none !important;
   }

@@ -2,8 +2,8 @@
 
 1. Open the public URL (or `npm run dev` locally).
 2. Landing: skim approved banners (hero → how it works → learn-fun-v2 → duel tease → judge tease → cta) → click **Enter the Arena** (nav, image CTA, or `#enter` pill).
-3. Briefing: you are **Nova Shipwright** (indigo cloak, rocket-wand) vs pretend rival **Synergy the Soft-Committed** (orange salamander, standup sticky). Note cinematic **before.png** cottage + riddle. No Wizard B inputs anywhere.
-4. Spell: **one** ornate spellbook field for Nova only. Synergy is name + avatar + wax “HOLD” — not controllable. 90-second countdown. **Cast · ship it** or wait for auto-cast at 0.
+3. Briefing: you are **Nova Shipwright** (indigo cloak, rocket-wand) vs pretend rival **Synergy the Soft-Committed** (orange salamander, standup sticky). Note cinematic **before.png** cottage **and** **Target after** (`after.png`) plus the riddle. No Wizard B inputs anywhere.
+4. Spell: **one** ornate spellbook field for Nova only + 90-second countdown. Synergy is name + avatar + status only (no input): starts as “Synergy is still casting…”, then after ~10s “Your foe hath made their move.” **Cast · ship it** or wait for auto-cast at 0.
 5. Wait: casting animation in the **duel UI** while Nova’s stub gen resolves. Rival output is `/duel/pool/rival-mock.png` (canned, not a second prompt).
 6. Results: Nova output | true after (`after.png`) | Synergy mock.
 7. Scores: **consulting the astral board** theater (hunting meters, cycling persona quips, rubric runes). Then stub/deterministic totals fill in. Stub badges stay on. **No live LLM.** Winner can still be Nova or Synergy from scores.
