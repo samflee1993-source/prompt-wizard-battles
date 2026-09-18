@@ -408,28 +408,41 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>Cast. Wait. Compare.</h2>
             <p className="lede">
-              {PLAYER.shortName}’s stub gen · true after · {RIVAL.shortName}’s
-              canned mock (not from a second prompt).
+              Professor’s before and target after (same stills as briefing), then{" "}
+              {PLAYER.shortName}’s transformation, then {RIVAL.shortName}’s
+              canned mock — not a second prompt.
             </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
             </div>
           </div>
-          <div className="reveal-grid">
+          <div className="reveal-stack">
+            <p className="reveal-label">Professor’s before &amp; target after</p>
+            <div className="reveal-truth">
+              <MediaFrame
+                src={pack.beforeUrl}
+                fallbackSrc={pack.beforeFallbackUrl}
+                alt="Before: a sleepy thatched cottage on a hill"
+                caption="Before"
+                tone="plain"
+              />
+              <MediaFrame
+                src={pack.afterUrl}
+                fallbackSrc={pack.afterFallbackUrl}
+                alt="Target after: the true transformation to recreate"
+                caption="Target after"
+                tone="true"
+              />
+            </div>
+            <p className="reveal-label">{PLAYER.name}’s transformation</p>
             <MediaFrame
               src={session.outputs.a}
               fallbackSrc={pack.stubOutA}
               alt={`${PLAYER.name} generated output`}
-              caption={PLAYER.name}
+              caption={`${PLAYER.name} · transformation`}
               tone="a"
             />
-            <MediaFrame
-              src={pack.afterUrl}
-              fallbackSrc={pack.afterFallbackUrl}
-              alt="True after image"
-              caption="True after"
-              tone="true"
-            />
+            <p className="reveal-label">{RIVAL.name}’s generated image</p>
             <MediaFrame
               src={session.outputs.b}
               fallbackSrc={RIVAL.mockOutFallbackUrl}

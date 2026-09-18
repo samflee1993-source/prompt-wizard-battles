@@ -315,11 +315,29 @@ code {
   margin-top: 20px;
 }
 
-.reveal-grid {
+.reveal-stack {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin-top: 20px;
+}
+
+.reveal-label {
+  margin: 8px 0 0;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.reveal-stack > .reveal-label:first-child {
+  margin-top: 0;
+}
+
+.reveal-truth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .media-frame {
@@ -896,7 +914,7 @@ textarea:focus {
   .brief-grid,
   .spell-grid,
   .score-grid,
-  .reveal-grid,
+  .reveal-truth,
   .matchup {
     grid-template-columns: 1fr;
   }
