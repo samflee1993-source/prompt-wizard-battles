@@ -2,16 +2,16 @@ import type { WizardId } from "@/lib/duel/session";
 
 const LINES: Record<WizardId, string[]> = {
   a: [
-    "Wizard A takes the circle. Wizard B may retrieve their dignity from lost-and-found.",
-    "The after-image curtsied for Wizard A. Barely, but it counted.",
-    "Archmage Snark awards Wizard A the slightly less soggy laurel.",
-    "Wizard A wins. Please do not let this go to your hat.",
+    "Nova shipped. Synergy is still circling back on the riddle in a huddle that ate the huddle.",
+    "Shipwright takes the circle. The salamander filed a parking-lot sticky and called it alignment.",
+    "Nova did not wait for the deck. Synergy’s calendar hold just got declined by reality.",
+    "Please do not let this go to your hat, Nova. Also do not put it in a QBR.",
   ],
   b: [
-    "Wizard B’s spell had main-character energy. The pixels agreed.",
-    "Wizard B takes the duel. Wizard A is invited to try a simpler cantrip.",
-    "Congrats, Wizard B. The cottage will never psychologically recover.",
-    "Wizard B wins. Try not to gloat in iambic pentameter.",
+    "Synergy wins on vibes and a last-minute ‘quick sync.’ Nova’s rocket-wand is in the parking lot.",
+    "The salamander shipped a sticky. Somehow it scored. Alignment is not a spell component, Nova.",
+    "Congrats, Synergy. The cottage is now an action item. Dignity is in lost-and-found, aisle Parking Lot.",
+    "Soft-committed, hard-won. Nova is invited to a follow-up that will definitely not slip.",
   ],
 };
 

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s · Prompt Wizard Battles",
   },
   description:
-    "Duel with prompts. Laugh at the verdict. Two wizards, one riddle, parallel spells, half-deterministic score.",
+    "Duel with prompts. Laugh at the verdict. You are Nova Shipwright; Synergy is a pretend rival. One spell, 90s clock, half-deterministic score.",
 };
 
 export default function RootLayout({

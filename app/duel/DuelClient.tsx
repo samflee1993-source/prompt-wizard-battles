@@ -1,12 +1,25 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { CastingWait } from "@/components/CastingWait";
 import { MediaFrame } from "@/components/MediaFrame";
 import { ScoreMeter } from "@/components/ScoreMeter";
 import { StubBadge } from "@/components/StubBadge";
+import { WizardPortrait } from "@/components/WizardPortrait";
 import { CANNED_PACK } from "@/lib/duel/pack";
 import type { DuelSession, JudgeDetail } from "@/lib/duel/session";
+import {
+  EMPTY_SPELL_FALLBACK,
+  PLAYER,
+  RIVAL,
+  SPELL_SECONDS,
+} from "@/lib/duel/wizards";
 
 type Step = "briefing" | "spells" | "casting" | "reveal" | "score" | "winner";
 
@@ -32,6 +45,13 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+function formatClock(total: number): string {
+  const s = Math.max(0, total);
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return `${m}:${rem.toString().padStart(2, "0")}`;
+}
+
 export function DuelClient() {
   const pack = CANNED_PACK;
   const [step, setStep] = useState<Step>("briefing");
@@ -41,34 +61,38 @@ export function DuelClient() {
       : `duel-${Date.now()}`,
   );
   const [spellA, setSpellA] = useState("");
-  const [spellB, setSpellB] = useState("");
+  const [secondsLeft, setSecondsLeft] = useState(SPELL_SECONDS);
   const [session, setSession] = useState<DuelSession | null>(null);
   const [judgeDetail, setJudgeDetail] = useState<JudgeDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const spellRef = useRef(spellA);
+  const busyRef = useRef(false);
+
+  useEffect(() => {
+    spellRef.current = spellA;
+  }, [spellA]);
+
   const stepIndex = STEPS.indexOf(step);
+  const canCast = spellA.trim().length >= 3;
 
-  const canCast = spellA.trim().length >= 3 && spellB.trim().length >= 3;
+  async function runCast(source: "submit" | "timer") {
+    if (busyRef.current) return;
+    const typed = spellRef.current.trim();
+    if (source === "submit" && typed.length < 3) return;
 
-  async function castSpells(event: FormEvent) {
-    event.preventDefault();
-    if (!canCast) return;
+    busyRef.current = true;
     setError(null);
     setStep("casting");
 
+    const spellForA = typed.length >= 3 ? typed : EMPTY_SPELL_FALLBACK;
+
     try {
-      const [outA, outB] = await Promise.all([
-        postJson<{ imageUrl: string }>("/api/cast", {
-          beforeUrl: pack.beforeUrl,
-          spell: spellA.trim(),
-          seed: "a",
-        }),
-        postJson<{ imageUrl: string }>("/api/cast", {
-          beforeUrl: pack.beforeUrl,
-          spell: spellB.trim(),
-          seed: "b",
-        }),
-      ]);
+      const outA = await postJson<{ imageUrl: string }>("/api/cast", {
+        beforeUrl: pack.beforeUrl,
+        spell: spellForA,
+        seed: "a",
+      });
 
       const scored = await postJson<{
         session: DuelSession;
@@ -79,9 +103,9 @@ export function DuelClient() {
         beforeUrl: pack.beforeUrl,
         afterUrl: pack.afterUrl,
         outAUrl: outA.imageUrl,
-        outBUrl: outB.imageUrl,
-        spellA: spellA.trim(),
-        spellB: spellB.trim(),
+        outBUrl: RIVAL.mockOutUrl,
+        spellA: spellForA,
+        spellB: RIVAL.mockSpell,
         riddle: pack.riddle,
       });
 
@@ -90,26 +114,54 @@ export function DuelClient() {
       setStep("reveal");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Casting fizzled.");
+      busyRef.current = false;
       setStep("spells");
     }
   }
 
+  useEffect(() => {
+    if (step !== "spells") return;
+    setSecondsLeft(SPELL_SECONDS);
+    const started = Date.now();
+    const id = window.setInterval(() => {
+      const left = Math.max(
+        0,
+        SPELL_SECONDS - Math.floor((Date.now() - started) / 1000),
+      );
+      setSecondsLeft(left);
+      if (left === 0) {
+        window.clearInterval(id);
+        void runCast("timer");
+      }
+    }, 250);
+    return () => window.clearInterval(id);
+    // Intentionally start a fresh 90s clock each time we enter spells.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    void runCast("submit");
+  }
+
   function resetDuel() {
+    busyRef.current = false;
     setSpellA("");
-    setSpellB("");
+    setSecondsLeft(SPELL_SECONDS);
     setSession(null);
     setJudgeDetail(null);
     setError(null);
     setStep("briefing");
   }
 
-  const winnerName = session?.winner === "b" ? "Wizard B" : "Wizard A";
+  const winnerName =
+    session?.winner === "b" ? RIVAL.name : PLAYER.name;
 
   const stepLabel = useMemo(
     () =>
       ({
         briefing: "Briefing",
-        spells: "Spells",
+        spells: "Spell",
         casting: "Casting",
         reveal: "Reveal",
         score: "Score",
@@ -121,8 +173,9 @@ export function DuelClient() {
   return (
     <div className="duel-shell">
       <header className="duel-top">
-        <p className="eyebrow">Same riddle. Two spells. Parallel generation.</p>
+        <p className="eyebrow">One riddle. One spell. A calendar-hold rival.</p>
         <h1>{pack.title}</h1>
+        <Matchup />
         <ol className="stepper" aria-label="Duel steps">
           {STEPS.map((s, i) => (
             <li
@@ -131,7 +184,7 @@ export function DuelClient() {
                 i === stepIndex ? "is-current" : i < stepIndex ? "is-done" : ""
               }
             >
-              {s}
+              {s === "spells" ? "spell" : s}
             </li>
           ))}
         </ol>
@@ -149,8 +202,9 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>Get the riddle</h2>
             <p className="lede">
-              Watch the before. Read the riddle. Then replicate the hidden
-              transformation with your own prompt — learn by laughing.
+              You are {PLAYER.name}. {RIVAL.name} is already on the invite —
+              name and face only, no second prompt. Watch the before, then
+              ship one spell before the clock does it for you.
             </p>
           </div>
           <div className="brief-grid">
@@ -166,8 +220,12 @@ export function DuelClient() {
             </blockquote>
           </div>
           <div className="actions">
-            <button type="button" className="btn primary" onClick={() => setStep("spells")}>
-              Choose your spells
+            <button
+              type="button"
+              className="btn primary"
+              onClick={() => setStep("spells")}
+            >
+              Speak your spell
             </button>
           </div>
         </section>
@@ -178,39 +236,55 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>Cast your prompt</h2>
             <p className="lede">
-              One spell each. Do not peek at the after — that is the whole
-              sport. Closest match wins bragging rights.
+              Ninety seconds. Cast when you are ready — or the circle auto-casts
+              at zero. Do not peek at the after. {RIVAL.shortName} is not
+              taking notes from you.
             </p>
+          </div>
+          <div
+            className={`countdown ${secondsLeft <= 10 ? "is-low" : ""}`}
+            role="timer"
+            aria-live="polite"
+            aria-label={`${secondsLeft} seconds remaining`}
+          >
+            <span className="countdown-label">Ship window</span>
+            <span className="countdown-clock">{formatClock(secondsLeft)}</span>
           </div>
           <blockquote className="riddle compact">
             <p>{pack.riddle}</p>
           </blockquote>
-          <form className="spell-form" onSubmit={castSpells}>
-            <div className="spell-grid">
+          <form className="spell-form" onSubmit={onSubmit}>
+            <div className="spell-grid single-player">
               <label className="spell-card tone-a">
-                <span className="wizard-name">Wizard A</span>
+                <span className="wizard-chip">
+                  <WizardPortrait who="a" size="sm" />
+                  <span>
+                    <span className="wizard-name">{PLAYER.name}</span>
+                    <span className="wizard-tag">{PLAYER.tagline}</span>
+                  </span>
+                </span>
                 <textarea
                   name="spellA"
                   rows={5}
-                  required
                   minLength={3}
                   value={spellA}
                   onChange={(e) => setSpellA(e.target.value)}
                   placeholder="Speak your spell…"
                 />
               </label>
-              <label className="spell-card tone-b">
-                <span className="wizard-name">Wizard B</span>
-                <textarea
-                  name="spellB"
-                  rows={5}
-                  required
-                  minLength={3}
-                  value={spellB}
-                  onChange={(e) => setSpellB(e.target.value)}
-                  placeholder="Speak your spell…"
-                />
-              </label>
+              <aside className="spell-card tone-b rival-card">
+                <span className="wizard-chip">
+                  <WizardPortrait who="b" size="sm" />
+                  <span>
+                    <span className="wizard-name">{RIVAL.name}</span>
+                    <span className="wizard-tag">{RIVAL.tagline}</span>
+                  </span>
+                </span>
+                <p className="rival-lock">
+                  Pretend rival. Not controllable. Already “casting” a canned
+                  mock — you do not prompt them.
+                </p>
+              </aside>
             </div>
             <div className="actions">
               <button
@@ -244,6 +318,10 @@ export function DuelClient() {
         <section className="panel">
           <div className="panel-head">
             <h2>Cast. Wait. Compare.</h2>
+            <p className="lede">
+              {PLAYER.shortName}’s stub gen · true after · {RIVAL.shortName}’s
+              canned mock (not from a second prompt).
+            </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
             </div>
@@ -251,8 +329,8 @@ export function DuelClient() {
           <div className="reveal-grid">
             <MediaFrame
               src={session.outputs.a}
-              alt="Wizard A generated output"
-              caption="Wizard A"
+              alt={`${PLAYER.name} generated output`}
+              caption={PLAYER.name}
               tone="a"
             />
             <MediaFrame
@@ -263,8 +341,8 @@ export function DuelClient() {
             />
             <MediaFrame
               src={session.outputs.b}
-              alt="Wizard B generated output"
-              caption="Wizard B"
+              alt={`${RIVAL.name} mock rival creation`}
+              caption={`${RIVAL.name} · mock`}
               tone="b"
             />
           </div>
@@ -286,7 +364,7 @@ export function DuelClient() {
             <h2>The Judge</h2>
             <p className="lede">
               Personality LLM. Half-deterministic. Fully ridiculous — 50%
-              lexical match · 50% {judgeDetail.persona}.
+              lexical match · 50% {judgeDetail.persona}. Stubbed on purpose.
             </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
@@ -295,7 +373,9 @@ export function DuelClient() {
           </div>
           <div className="score-grid">
             <article className="score-card tone-a">
-              <h3>Wizard A</h3>
+              <h3>
+                <WizardPortrait who="a" size="sm" /> {PLAYER.name}
+              </h3>
               <p className="spell-echo">“{session.spells.a}”</p>
               <ScoreMeter
                 label="Deterministic"
@@ -318,8 +398,13 @@ export function DuelClient() {
               </ul>
             </article>
             <article className="score-card tone-b">
-              <h3>Wizard B</h3>
-              <p className="spell-echo">“{session.spells.b}”</p>
+              <h3>
+                <WizardPortrait who="b" size="sm" /> {RIVAL.name}
+              </h3>
+              <p className="spell-echo">
+                Canned rival mock — not from a second prompt. Synergy is still
+                aligning.
+              </p>
               <ScoreMeter
                 label="Deterministic"
                 value={session.scores.b.deterministic}
@@ -357,6 +442,12 @@ export function DuelClient() {
         <section className="panel winner-panel">
           <div className="panel-head">
             <p className="eyebrow gold">Funny verdict. No sacred cows.</p>
+            <div className="winner-face">
+              <WizardPortrait
+                who={session.winner}
+                size="lg"
+              />
+            </div>
             <h2>{winnerName}</h2>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
@@ -365,11 +456,8 @@ export function DuelClient() {
           </div>
           <p className="congrats">{session.congrats}</p>
           <p className="totals-line">
-            {winnerName} {session.scores[session.winner].total} · the other
-            wizard{" "}
-            {session.winner === "a"
-              ? session.scores.b.total
-              : session.scores.a.total}
+            {PLAYER.name} {session.scores.a.total} · {RIVAL.name}{" "}
+            {session.scores.b.total}
           </p>
           <p className="persona-note">Judged in the manner of {judgeDetail.persona}.</p>
           <div className="actions">
@@ -382,6 +470,28 @@ export function DuelClient() {
           </div>
         </section>
       ) : null}
+    </div>
+  );
+}
+
+function Matchup() {
+  return (
+    <div className="matchup" aria-label={`${PLAYER.name} versus ${RIVAL.name}`}>
+      <div className="matchup-side">
+        <WizardPortrait who="a" size="md" />
+        <div>
+          <p className="matchup-name">{PLAYER.name}</p>
+          <p className="matchup-tag">{PLAYER.tagline}</p>
+        </div>
+      </div>
+      <p className="matchup-vs">vs</p>
+      <div className="matchup-side">
+        <WizardPortrait who="b" size="md" />
+        <div>
+          <p className="matchup-name">{RIVAL.name}</p>
+          <p className="matchup-tag">{RIVAL.tagline}</p>
+        </div>
+      </div>
     </div>
   );
 }

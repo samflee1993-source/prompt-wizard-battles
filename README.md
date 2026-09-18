@@ -1,6 +1,6 @@
 # Prompt Wizard Battles (POC)
 
-Two-wizard prompt duel: same **before** image + **riddle**, one **spell** each, gens in **parallel**, then a split score (50% deterministic / 50% personality judge) and a funny winner line.
+Single-player prompt duel: you are **Nova Shipwright** vs pretend rival **Synergy the Soft-Committed**. Same **before** image + **riddle**, one **spell** on a **90s** clock, then a split score (50% deterministic / 50% personality judge) against a canned rival mock and a funny winner line.
 
 Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md). Click path: [`DEMO.md`](./DEMO.md).
 

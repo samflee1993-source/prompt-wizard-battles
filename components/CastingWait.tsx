@@ -21,8 +21,8 @@ export function CastingWait() {
       </div>
       <p className="casting-kicker">Wait for the sparks</p>
       <p className="casting-copy">
-        Both wizards cast at once. Teal vs magenta, same riddle — the circle
-        waits on the slower spark, not the sum of both.
+        Nova’s stub gen is in flight. Synergy’s output is a canned mock already
+        on the calendar — the circle waits on the ship, not a second prompt.
       </p>
     </div>
   );
