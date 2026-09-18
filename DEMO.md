@@ -16,3 +16,8 @@ Expect stubs labeled until real gen/judge keys are set.
 **PASS** (2026-09-18, local `npm run dev`, pre-landing-swap): briefing → two spells → casting (`stubbed gen`) → reveal A|after|B → scores (`stubbed gen` + `stubbed judge`, A 67 vs B 37) → winner Wizard A, “Please do not let this go to your hat.”
 
 Landing swap + visual SoT follow in this PR; re-click `/` → **Enter the Arena** after deploy.
+
+## Live demo (ephemeral tunnel)
+
+- Public: https://meet-net-villa-weed.trycloudflare.com (Cloudflare quick tunnel; no card; dies when tunnel/box stops)
+- Local: `npm run build && npm run start` → http://localhost:3000
