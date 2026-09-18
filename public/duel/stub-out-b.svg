@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="Stub output B: the cottage with a tiny crystal chimney">
+  <defs>
+    <linearGradient id="sbsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a3358"/>
+      <stop offset="100%" stop-color="#d08a6a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="url(#sbsky)"/>
+  <path d="M80 150 C 180 90, 260 180, 400 110" fill="none" stroke="#7eb6ff" stroke-width="14" opacity="0.35"/>
+  <path d="M0 400 C 180 350, 320 430, 500 380 C 700 320, 820 400, 960 360 L 960 600 L 0 600 Z" fill="#2c4034"/>
+  <g transform="translate(330,220)">
+    <rect x="40" y="110" width="220" height="150" fill="#6b4a32"/>
+    <polygon points="20,110 150,20 280,110" fill="#c48a52"/>
+    <rect x="128" y="168" width="44" height="92" fill="#2a1c14"/>
+    <rect x="70" y="150" width="40" height="36" fill="#7eb6ff"/>
+    <rect x="190" y="150" width="40" height="36" fill="#ff8e6e"/>
+    <polygon points="196,78 224,28 252,78" fill="#9be7c4"/>
+    <circle cx="224" cy="18" r="10" fill="#e9fbff"/>
+  </g>
+  <g fill="#fff6d8" opacity="0.8">
+    <circle cx="520" cy="160" r="3"/>
+    <circle cx="560" cy="120" r="2"/>
+    <circle cx="600" cy="170" r="3"/>
+    <circle cx="640" cy="90" r="2"/>
+  </g>
+  <text x="40" y="560" fill="#efe6d8" font-size="18" font-family="Georgia, serif" opacity="0.7">STUB GEN B · cottage, ambitious chimney</text>
+</svg>

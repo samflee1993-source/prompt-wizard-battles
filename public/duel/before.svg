@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="Before: a sleepy thatched cottage">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b4668"/>
+      <stop offset="55%" stop-color="#7b6a7a"/>
+      <stop offset="100%" stop-color="#c9a07a"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#35503a"/>
+      <stop offset="100%" stop-color="#203026"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="url(#sky)"/>
+  <circle cx="780" cy="90" r="42" fill="#f3d7a0" opacity="0.85"/>
+  <ellipse cx="200" cy="120" rx="70" ry="24" fill="#efe6d8" opacity="0.25"/>
+  <ellipse cx="280" cy="100" rx="50" ry="18" fill="#efe6d8" opacity="0.18"/>
+  <path d="M0 390 C 180 340, 320 420, 500 370 C 700 310, 820 390, 960 350 L 960 600 L 0 600 Z" fill="url(#hill)"/>
+  <path d="M0 470 C 220 430, 480 510, 960 450 L 960 600 L 0 600 Z" fill="#1a261c"/>
+  <g transform="translate(330,210)">
+    <rect x="40" y="110" width="220" height="150" fill="#6b4a32"/>
+    <polygon points="20,110 150,20 280,110" fill="#8a5a36"/>
+    <polygon points="36,110 150,36 264,110" fill="#c48a52"/>
+    <rect x="128" y="168" width="44" height="92" fill="#2a1c14"/>
+    <rect x="70" y="150" width="40" height="36" fill="#f0c56a"/>
+    <rect x="190" y="150" width="40" height="36" fill="#f0c56a"/>
+    <rect x="196" y="70" width="28" height="48" fill="#4a3324"/>
+    <path d="M204 70 C 198 40, 222 28, 216 10" fill="none" stroke="#d9d3cb" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="560" fill="#efe6d8" font-size="18" font-family="Georgia, serif" opacity="0.7">BEFORE · sleepy cottage</text>
+</svg>

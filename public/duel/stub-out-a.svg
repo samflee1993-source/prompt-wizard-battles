@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="Stub output A: a gothic stone tower with a crystal cap">
+  <defs>
+    <linearGradient id="sasky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c2038"/>
+      <stop offset="100%" stop-color="#6a5360"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="url(#sasky)"/>
+  <circle cx="820" cy="80" r="36" fill="#d9dde8"/>
+  <path d="M0 410 C 200 360, 500 450, 960 380 L 960 600 L 0 600 Z" fill="#24322c"/>
+  <g transform="translate(390,80)">
+    <polygon points="90,0 130,70 50,70" fill="#9be7c4"/>
+    <rect x="40" y="70" width="100" height="280" fill="#4d5468"/>
+    <rect x="18" y="160" width="144" height="210" fill="#3b4256"/>
+    <polygon points="18,160 90,110 162,160" fill="#5c657c"/>
+    <rect x="78" y="200" width="24" height="40" fill="#7eb6ff"/>
+    <rect x="48" y="270" width="20" height="28" fill="#f0c56a"/>
+    <rect x="112" y="270" width="20" height="28" fill="#f0c56a"/>
+    <rect x="78" y="310" width="24" height="80" fill="#1a1408"/>
+    <rect x="28" y="120" width="16" height="40" fill="#4d5468"/>
+    <rect x="136" y="120" width="16" height="40" fill="#4d5468"/>
+  </g>
+  <text x="40" y="560" fill="#efe6d8" font-size="18" font-family="Georgia, serif" opacity="0.7">STUB GEN A · stone keep, crystal hat</text>
+</svg>

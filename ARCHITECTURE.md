@@ -17,60 +17,67 @@ Happy path once is enough. No deep QA.
 - Announce winning wizard + short funny congrats.
 - Out of scope: brand system, CI matrices, features beyond this loop.
 
-## Proposed stack (thinnest public)
+## Stack (as implemented)
 
 | Layer | Choice | Why |
 |-------|--------|-----|
-| App | Next.js App Router (TypeScript) **or** Vite + React + one serverless API | Fast to host; API routes for gen/judge stubs |
+| App | Next.js 15 App Router (TypeScript) | Fast to host; API routes for gen/judge stubs |
 | Host | Vercel free tier from GitHub | Public URL without paid APIs for stubs |
-| Media | Static placeholders in `/public/duel/` | Swap Landing assets later |
+| Media | Approved landing PNGs in `/public/landing/` + canned duel SVGs | Swap gen/judge later |
 | State | Client step machine + one duel session id | No DB for POC |
 
-Repo target: `samflee1993-source/prompt-wizard-battles` (or Origin later).
+Repo: `samflee1993-source/prompt-wizard-battles`.
 
-## Repo layout (target)
+## Repo layout
 
 ```
 /
   README.md                 # run + deploy
   ARCHITECTURE.md           # this file
-  DEMO.md                   # click script
-  app/ or src/              # UI steps
+  DEMO.md                   # click script + smoke note
+  .env.example              # future provider keys
+  app/                      # App Router UI + API
+    page.tsx                # landing (approved banners)
+    duel/page.tsx           # duel step machine
+    api/cast/route.ts       # POST /api/cast
+    api/score/route.ts      # POST /api/score
+  components/               # StubBadge, CastingWait, MediaFrame, ScoreMeter
   lib/
     gen/                    # ImageGenProvider interface + StubImageGen
     judge/                  # JudgeProvider interface + StubPersonalityJudge
     score/                  # deterministicSimilarity + combineScores
-    duel/                   # canned duel pack (before, after, riddle)
+    duel/                   # canned duel pack, session type, congrats
   public/
-    landing/                # placeholder until Landing handoff
-    duel/                   # before.png, after.png, stub outputs
-  api/ or app/api/          # POST /api/cast, POST /api/score
+    landing/                # approved banners + index.html + HANDOFF.md
+    duel/                   # before.svg, after.svg, stub-out-a.svg, stub-out-b.svg
 ```
 
 ## UI flow (steps)
 
-1. **Landing** — placeholder blocks; CTA “Enter the duel”.
-2. **Duel briefing** — before media + riddle (shared).
-3. **Spell input** — Wizard A + Wizard B each one prompt (sequential or side-by-side).
-4. **Casting** — wait animation; fire two gen calls in parallel.
+1. **Landing** (`/`) — approved banners in page order; CTAs “Enter the Arena” → `/duel`.
+2. **Duel briefing** (`/duel`) — before media + riddle (shared).
+3. **Spell input** — Wizard A + Wizard B each one prompt (side-by-side).
+4. **Casting** — wait animation; fire two gen calls in parallel (`Promise.all`).
 5. **Reveal** — Wizard A output | true after | Wizard B output.
 6. **Score** — show split: deterministic / judge / total.
 7. **Winner** — wizard name + funny congrats line.
 
-Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`.
+Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing is approved visual SoT (not a stub). Duel UI reuses that palette, pill CTAs, and playful wizard tone.
 
 ## Data flow
 
 ```
 [Landing CTA]
-    → load DuelPack { beforeUrl, afterUrl, riddle, hintMethod? }
+    → load DuelPack { beforeUrl, afterUrl, riddle, hintMethod, targetKeywords }
     → user spells { wizardA, wizardB }
-    → Promise.all([ gen.cast(before, spellA), gen.cast(before, spellB) ])
+    → Promise.all([ gen.cast(before, spellA, seed a), gen.cast(before, spellB, seed b) ])
     → outputs { outA, outB }
-    → detA = similarity(outA, after); detB = similarity(outB, after)
+    → detA = deterministicSimilarity(spellA, targetKeywords)
+    → detB = deterministicSimilarity(spellB, targetKeywords)
     → judge = judge.score({ before, after, outA, outB, spells, riddle })
-    → total = 0.5 * det + 0.5 * judge.personality  (per wizard)
-    → winner = argmax(total); congrats = funnyLine(winner)
+    → total = round(0.5 * det + 0.5 * judge.personality)  (per wizard)
+    → winner = argmax(total); tie-break higher det, then Wizard A
+    → congrats = funnyLine(winner)
 ```
 
 Session shape (client or API):
@@ -117,15 +124,15 @@ export interface JudgeProvider {
 }
 ```
 
-**Stub gen:** ignore spell semantics; return canned `stub-out-a.png` / `stub-out-b.png` after a short delay (simulate parallel latency).  
-**Stub judge:** persona e.g. “Archmage Snark”; hash prompt+urls into stable 0–100 rubric buckets + witty one-liner.  
-**Deterministic:** POC = pixel/histogram distance on placeholders, or lexical overlap of spell vs riddle keywords mapped to 0–100 — document which; keep pure function in `lib/score/deterministic.ts`.
+**Stub gen:** ignore spell semantics; return canned `stub-out-a.svg` / `stub-out-b.svg` after a short delay (seed `a`/`b`; ~1200ms / ~1550ms so `Promise.all` waits on max, not sum).  
+**Stub judge:** persona “Archmage Snark” (overridable via `JUDGE_PERSONA`); hash prompt+urls into stable 0–100 rubric buckets (theatricality, cunning, resemblance, panache) + witty one-liner.  
+**Deterministic:** lexical overlap of the wizard’s spell against `pack.targetKeywords` (the hidden prompt-method the riddle hints at), mapped to ~14–98. Pure function in `lib/score/deterministic.ts`. Pixel/histogram distance was skipped because placeholder SVGs would barely move the score with user input.
 
 ## Scoring split
 
 | Half | Weight | Implementation (POC) | Real plug-in |
 |------|--------|----------------------|--------------|
-| Deterministic | 0.5 | `deterministicSimilarity(out, after) → 0..100` | CLIP / LPIPS / embedding cosine vs after |
+| Deterministic | 0.5 | `deterministicSimilarity(spell, targetKeywords) → 0..100` | CLIP / LPIPS / embedding cosine vs after |
 | Personality judge | 0.5 | StubPersonalityJudge rubric | LLM agent with fixed persona + rubric JSON schema |
 
 `total = round(0.5 * det + 0.5 * judge)`. Tie-break: higher deterministic, then Wizard A.
@@ -141,29 +148,35 @@ export interface JudgeProvider {
 | `JUDGE_MODEL` | no | Model id for judge |
 | `JUDGE_PERSONA` | no | Override default Archmage Snark |
 
-Never commit `.env`. Empty `.env.example` lists the keys above.
+Never commit `.env`. Empty `.env.example` lists the keys above. Unwired non-stub provider names log a warning and still use stubs.
 
 ## Stubs vs real
 
 | Piece | POC | Real later |
 |-------|-----|------------|
-| Landing visuals | Placeholder HTML/CSS | Approved Landing blocks + markup |
-| Before / after / stub outs | Static files in `/public` | Real pack assets / CDN |
+| Landing visuals | Approved banners (`hero-v1` … `cta-v1`, `learn-fun-v2`) | Optional HTML typography instead of image copy |
+| Before / after / stub outs | Static SVG in `/public/duel` | Real pack assets / CDN |
 | Image gen | `StubImageGen` | Provider behind `ImageGenProvider` |
 | Judge | `StubPersonalityJudge` | LLM + rubric agent |
-| Deterministic score | Simple local metric | Embedding / perceptual metric |
-| Wait animation | CSS loop | Optional Lottie from Landing |
+| Deterministic score | Lexical overlap vs target keywords | Embedding / perceptual metric |
+| Wait animation | CSS loop in duel UI | Optional Lottie |
 | Persistence | None | Optional session store |
 
-## Landing handoff (when ready)
+## Landing (wired)
 
-Expect from Landing / Orchestrator:
+Approved assets in `/public/landing/`, rendered by `app/page.tsx` in this order:
 
-1. Approved section images (paths or URLs)
-2. Minimal HTML/CSS (or section markup)
-3. Note: sizes + what still needs duel wiring
+1. `hero-v1.png` (image CTA → `/duel`)
+2. `how-it-works-v1.png`
+3. `learn-fun-v2.png` (do not ship v1)
+4. `duel-tease-v1.png`
+5. `judge-tease-v1.png`
+6. `cta-v1.png` (image CTA → `/duel`)
+7. Live `#enter` pill → `/duel`
 
-Wire into `/public/landing/` + landing route; keep duel routes unchanged.
+Nav **Enter the Arena** also goes to `/duel`. Wait-loop stays on the duel route.
+
+Visual system (source of truth for landing **and** duel UI): dark purple `#14081f`, ink `#f5f0ff`, muted `#c9b8e8`, accent gold `#f5d76e`, CTA pill `#e8d4ff` on `#2a1840`, sticky header, rounded pill CTAs, full-bleed section banners, playful wizard tone.
 
 ## Smoke (once)
 
