@@ -332,8 +332,10 @@ code {
 
 .media-frame img {
   width: 100%;
+  height: auto;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0a0412;
 }
 
 .media-frame figcaption {
