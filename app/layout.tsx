@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Fredoka, Outfit } from "next/font/google";
+import { Cinzel, Fredoka, Outfit } from "next/font/google";
 import "./globals.css";
 
 const display = Fredoka({
@@ -14,6 +14,13 @@ const ui = Outfit({
   subsets: ["latin"],
   variable: "--font-ui",
   display: "swap",
+});
+
+const spell = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-spell",
+  display: "swap",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +38,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${ui.variable}`}>
+    <html lang="en" className={`${display.variable} ${ui.variable} ${spell.variable}`}>
       <body>
         <a className="skip" href="#main">
           Skip to content

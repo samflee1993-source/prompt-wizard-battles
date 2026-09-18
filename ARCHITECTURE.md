@@ -42,7 +42,7 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
     duel/page.tsx           # duel step machine
     api/cast/route.ts       # POST /api/cast
     api/score/route.ts      # POST /api/score
-  components/               # StubBadge, CastingWait, MediaFrame, ScoreMeter, WizardPortrait
+  components/               # StubBadge, CastingWait, MediaFrame, ScoreMeter, WizardPortrait, AstralBoard
   lib/
     gen/                    # ImageGenProvider interface + StubImageGen
     judge/                  # JudgeProvider interface + StubPersonalityJudge
@@ -60,7 +60,7 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
 3. **Spell input** — Nova only (90s timer). Synergy is a locked rival card.
 4. **Casting** — wait animation; one gen call for Nova. Rival still is canned.
 5. **Reveal** — Nova output | true after | Synergy mock.
-6. **Score** — show split: deterministic / judge / total (A vs rival mock).
+6. **Score** — theatrical “consulting the astral board” (meters hunt, quips cycle), then stub/deterministic totals. No live LLM.
 7. **Winner** — wizard name + funny congrats line.
 
 Every stub surfaces a visible badge: `stubbed gen`, `stubbed judge`. Landing is approved visual SoT (not a stub). Duel UI reuses that palette, pill CTAs, and playful wizard tone.
@@ -158,7 +158,7 @@ Never commit `.env`. Empty `.env.example` lists the keys above. Unwired non-stub
 | Landing visuals | Approved banners (`hero-v1` … `cta-v1`, `learn-fun-v2`) | Optional HTML typography instead of image copy |
 | Before / after / stub outs | Static SVG in `/public/duel` | Real pack assets / CDN |
 | Image gen | `StubImageGen` | Provider behind `ImageGenProvider` |
-| Judge | `StubPersonalityJudge` | LLM + rubric agent |
+| Judge | `StubPersonalityJudge` + theatrical astral-board animation | LLM + rubric agent |
 | Deterministic score | Lexical overlap vs target keywords | Embedding / perceptual metric |
 | Wait animation | CSS loop in duel UI | Optional Lottie |
 | Persistence | None | Optional session store |

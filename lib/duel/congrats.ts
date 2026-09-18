@@ -6,12 +6,14 @@ const LINES: Record<WizardId, string[]> = {
     "Shipwright takes the circle. The salamander filed a parking-lot sticky and called it alignment.",
     "Nova did not wait for the deck. Synergy’s calendar hold just got declined by reality.",
     "Please do not let this go to your hat, Nova. Also do not put it in a QBR.",
+    "The after-image signed off. Synergy asked if we could ‘take this offline’ in a crystal tower.",
   ],
   b: [
     "Synergy wins on vibes and a last-minute ‘quick sync.’ Nova’s rocket-wand is in the parking lot.",
     "The salamander shipped a sticky. Somehow it scored. Alignment is not a spell component, Nova.",
     "Congrats, Synergy. The cottage is now an action item. Dignity is in lost-and-found, aisle Parking Lot.",
     "Soft-committed, hard-won. Nova is invited to a follow-up that will definitely not slip.",
+    "Synergy’s calendar hold outlived the spell. Archmage Snark is updating the RACI in blood.",
   ],
 };
 

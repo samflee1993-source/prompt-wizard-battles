@@ -7,11 +7,13 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { AstralBoard } from "@/components/AstralBoard";
 import { CastingWait } from "@/components/CastingWait";
 import { MediaFrame } from "@/components/MediaFrame";
 import { ScoreMeter } from "@/components/ScoreMeter";
 import { StubBadge } from "@/components/StubBadge";
 import { WizardPortrait } from "@/components/WizardPortrait";
+import { ASTRAL_QUIPS } from "@/lib/duel/astral";
 import { CANNED_PACK } from "@/lib/duel/pack";
 import type { DuelSession, JudgeDetail } from "@/lib/duel/session";
 import {
@@ -65,6 +67,8 @@ export function DuelClient() {
   const [session, setSession] = useState<DuelSession | null>(null);
   const [judgeDetail, setJudgeDetail] = useState<JudgeDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [boardSettled, setBoardSettled] = useState(false);
+  const [quipIndex, setQuipIndex] = useState(0);
 
   const spellRef = useRef(spellA);
   const busyRef = useRef(false);
@@ -151,8 +155,36 @@ export function DuelClient() {
     setSession(null);
     setJudgeDetail(null);
     setError(null);
+    setBoardSettled(false);
+    setQuipIndex(0);
     setStep("briefing");
   }
+
+  useEffect(() => {
+    if (step !== "score") {
+      setBoardSettled(false);
+      setQuipIndex(0);
+      return;
+    }
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setBoardSettled(true);
+      return;
+    }
+    const quips = window.setInterval(() => {
+      setQuipIndex((n) => n + 1);
+    }, 700);
+    const settle = window.setTimeout(() => {
+      window.clearInterval(quips);
+      setBoardSettled(true);
+    }, 3200);
+    return () => {
+      window.clearInterval(quips);
+      window.clearTimeout(settle);
+    };
+  }, [step]);
 
   const winnerName =
     session?.winner === "b" ? RIVAL.name : PLAYER.name;
@@ -249,13 +281,20 @@ export function DuelClient() {
           >
             <span className="countdown-label">Ship window</span>
             <span className="countdown-clock">{formatClock(secondsLeft)}</span>
+            <span
+              className="countdown-bar"
+              aria-hidden
+              style={{
+                width: `${(secondsLeft / SPELL_SECONDS) * 100}%`,
+              }}
+            />
           </div>
           <blockquote className="riddle compact">
             <p>{pack.riddle}</p>
           </blockquote>
           <form className="spell-form" onSubmit={onSubmit}>
             <div className="spell-grid single-player">
-              <label className="spell-card tone-a">
+              <label className="spell-card tone-a spellbook">
                 <span className="wizard-chip">
                   <WizardPortrait who="a" size="sm" />
                   <span>
@@ -263,14 +302,28 @@ export function DuelClient() {
                     <span className="wizard-tag">{PLAYER.tagline}</span>
                   </span>
                 </span>
-                <textarea
-                  name="spellA"
-                  rows={5}
-                  minLength={3}
-                  value={spellA}
-                  onChange={(e) => setSpellA(e.target.value)}
-                  placeholder="Speak your spell…"
-                />
+                <div className="spellbook-field">
+                  <span className="spellbook-corner c-tl" aria-hidden />
+                  <span className="spellbook-corner c-tr" aria-hidden />
+                  <span className="spellbook-corner c-bl" aria-hidden />
+                  <span className="spellbook-corner c-br" aria-hidden />
+                  <p className="spellbook-kicker">
+                    Grimoire of Nova · one cantrip · no stakeholder deck
+                  </p>
+                  <textarea
+                    className="spellbook-ink"
+                    name="spellA"
+                    rows={6}
+                    minLength={3}
+                    value={spellA}
+                    onChange={(e) => setSpellA(e.target.value)}
+                    placeholder="Ink the transformation. Ship the spell, not the deck…"
+                  />
+                  <p className="spellbook-foot">
+                    ✦ Runes accept metaphors · ☾ auto-casts at zero · Synergy is
+                    not CC’d
+                  </p>
+                </div>
               </label>
               <aside className="spell-card tone-b rival-card">
                 <span className="wizard-chip">
@@ -280,9 +333,12 @@ export function DuelClient() {
                     <span className="wizard-tag">{RIVAL.tagline}</span>
                   </span>
                 </span>
+                <div className="rival-seal" aria-hidden>
+                  <span className="wax-seal">HOLD</span>
+                </div>
                 <p className="rival-lock">
-                  Pretend rival. Not controllable. Already “casting” a canned
-                  mock — you do not prompt them.
+                  Sealed calendar hold. No second prompt, no input, no “quick
+                  sync.” The salamander is aligning offline on a canned mock.
                 </p>
               </aside>
             </div>
@@ -295,7 +351,7 @@ export function DuelClient() {
                 Back
               </button>
               <button type="submit" className="btn primary" disabled={!canCast}>
-                Cast
+                Cast · ship it
               </button>
             </div>
           </form>
@@ -363,14 +419,19 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>The Judge</h2>
             <p className="lede">
-              Personality LLM. Half-deterministic. Fully ridiculous — 50%
-              lexical match · 50% {judgeDetail.persona}. Stubbed on purpose.
+              Personality theater. Half-deterministic. Fully ridiculous — 50%
+              lexical match · 50% {judgeDetail.persona}. No live LLM.
             </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
               {session.stubs.judge ? <StubBadge kind="judge" /> : null}
             </div>
           </div>
+          <AstralBoard
+            persona={judgeDetail.persona}
+            settled={boardSettled}
+            quip={ASTRAL_QUIPS[quipIndex % ASTRAL_QUIPS.length]}
+          />
           <div className="score-grid">
             <article className="score-card tone-a">
               <h3>
@@ -381,18 +442,32 @@ export function DuelClient() {
                 label="Deterministic"
                 value={session.scores.a.deterministic}
                 tone="a"
+                play={boardSettled}
+                delayMs={80}
               />
               <ScoreMeter
                 label="Personality judge"
                 value={session.scores.a.judge}
                 tone="a"
+                play={boardSettled}
+                delayMs={420}
               />
-              <ScoreMeter label="Total" value={session.scores.a.total} tone="gold" />
-              <p className="commentary">{judgeDetail.a.commentary}</p>
+              <ScoreMeter
+                label="Total"
+                value={session.scores.a.total}
+                tone="gold"
+                play={boardSettled}
+                delayMs={860}
+              />
+              <p className="commentary">
+                {boardSettled
+                  ? judgeDetail.a.commentary
+                  : "Archmage Snark is still tasting the cape…"}
+              </p>
               <ul className="rubric">
                 {Object.entries(judgeDetail.a.rubric).map(([k, v]) => (
                   <li key={k}>
-                    {k} <span>{v}</span>
+                    {k} <span>{boardSettled ? v : "✶"}</span>
                   </li>
                 ))}
               </ul>
@@ -409,18 +484,32 @@ export function DuelClient() {
                 label="Deterministic"
                 value={session.scores.b.deterministic}
                 tone="b"
+                play={boardSettled}
+                delayMs={160}
               />
               <ScoreMeter
                 label="Personality judge"
                 value={session.scores.b.judge}
                 tone="b"
+                play={boardSettled}
+                delayMs={500}
               />
-              <ScoreMeter label="Total" value={session.scores.b.total} tone="gold" />
-              <p className="commentary">{judgeDetail.b.commentary}</p>
+              <ScoreMeter
+                label="Total"
+                value={session.scores.b.total}
+                tone="gold"
+                play={boardSettled}
+                delayMs={980}
+              />
+              <p className="commentary">
+                {boardSettled
+                  ? judgeDetail.b.commentary
+                  : "The sticky is in the parking lot of the astral plane…"}
+              </p>
               <ul className="rubric">
                 {Object.entries(judgeDetail.b.rubric).map(([k, v]) => (
                   <li key={k}>
-                    {k} <span>{v}</span>
+                    {k} <span>{boardSettled ? v : "✶"}</span>
                   </li>
                 ))}
               </ul>
@@ -431,6 +520,7 @@ export function DuelClient() {
               type="button"
               className="btn primary"
               onClick={() => setStep("winner")}
+              disabled={!boardSettled}
             >
               Announce the victor
             </button>

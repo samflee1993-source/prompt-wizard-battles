@@ -467,15 +467,17 @@ code {
 }
 
 .countdown {
+  position: relative;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
   margin-top: 18px;
-  padding: 12px 16px;
+  padding: 12px 16px 16px;
   border-radius: 14px;
   background: rgba(10, 4, 18, 0.55);
   border: 1px solid var(--line);
+  overflow: hidden;
 }
 
 .countdown-label {
@@ -500,6 +502,20 @@ code {
 
 .countdown.is-low .countdown-clock {
   color: var(--danger);
+}
+
+.countdown-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), #e8d4ff);
+  box-shadow: 0 0 12px rgba(245, 215, 110, 0.55);
+  transition: width 0.25s linear;
+}
+
+.countdown.is-low .countdown-bar {
+  background: var(--danger);
 }
 
 .wizard-chip {
@@ -738,8 +754,28 @@ textarea:focus {
 
 .meter-fill {
   height: 100%;
+  width: 0;
   border-radius: inherit;
   background: var(--accent);
+  transition: width 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.meter.is-hunting .meter-fill {
+  width: 28%;
+  animation: meter-hunt 1.15s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.meter.tone-a.is-hunting .meter-fill {
+  animation-delay: 0s;
+}
+
+.meter.tone-b.is-hunting .meter-fill {
+  animation-delay: 0.18s;
+}
+
+.meter.tone-gold.is-hunting .meter-fill {
+  animation-delay: 0.32s;
 }
 
 .meter.tone-a .meter-fill {
@@ -847,5 +883,268 @@ textarea:focus {
 
   .matchup-vs {
     text-align: center;
+  }
+}
+
+.spell-card.spellbook {
+  padding: 16px;
+  background:
+    radial-gradient(80% 60% at 10% 0%, rgba(109, 91, 255, 0.18), transparent 55%),
+    rgba(10, 4, 18, 0.55);
+}
+
+.spellbook-field {
+  position: relative;
+  padding: 18px 16px 12px;
+  border-radius: 10px;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(245, 215, 110, 0.14), transparent 46%),
+    linear-gradient(180deg, #2a1840 0%, #14081f 58%, #0d0615 100%);
+  border: 1px solid rgba(245, 215, 110, 0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 212, 255, 0.16),
+    0 0 24px rgba(245, 215, 110, 0.1);
+}
+
+.spellbook-field::before {
+  content: "✦   ᚠ   ✧   ☾   ✶   ᚦ   ✦";
+  display: block;
+  text-align: center;
+  letter-spacing: 0.28em;
+  font-size: 0.62rem;
+  color: rgba(245, 215, 110, 0.72);
+  margin-bottom: 8px;
+}
+
+.spellbook-field:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 2px rgba(245, 215, 110, 0.45),
+    0 0 36px rgba(245, 215, 110, 0.28),
+    inset 0 0 28px rgba(109, 91, 255, 0.2);
+}
+
+.spellbook-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.spellbook-corner.c-tl {
+  top: 7px;
+  left: 7px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+}
+
+.spellbook-corner.c-tr {
+  top: 7px;
+  right: 7px;
+  border-top: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+}
+
+.spellbook-corner.c-bl {
+  bottom: 7px;
+  left: 7px;
+  border-bottom: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+}
+
+.spellbook-corner.c-br {
+  bottom: 7px;
+  right: 7px;
+  border-bottom: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+}
+
+.spellbook-kicker,
+.spellbook-foot {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.spellbook-kicker {
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.spellbook-foot {
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.spellbook-ink {
+  min-height: 168px;
+  background: rgba(10, 4, 18, 0.35);
+  border: 1px dashed rgba(232, 212, 255, 0.22);
+  font-family: var(--font-spell), Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  color: #fff6d8;
+  caret-color: var(--accent);
+}
+
+.spellbook-ink::placeholder {
+  color: rgba(201, 184, 232, 0.58);
+  font-style: italic;
+}
+
+.spellbook-ink:focus {
+  outline: none;
+  border-style: solid;
+  border-color: rgba(245, 215, 110, 0.55);
+  background: rgba(20, 8, 31, 0.55);
+}
+
+.rival-card {
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      -12deg,
+      rgba(255, 122, 58, 0.08),
+      rgba(255, 122, 58, 0.08) 8px,
+      rgba(10, 4, 18, 0.4) 8px,
+      rgba(10, 4, 18, 0.4) 16px
+    );
+}
+
+.rival-seal {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+
+.wax-seal {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #ffb08a, #c94a1a 62%, #6a1e0c);
+  color: #fff6d8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35), inset 0 0 0 3px rgba(245, 215, 110, 0.35);
+  transform: rotate(-8deg);
+}
+
+.astral-board {
+  position: relative;
+  margin-top: 18px;
+  padding: 18px 16px 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 215, 110, 0.28);
+  background: linear-gradient(180deg, rgba(42, 24, 64, 0.9), rgba(13, 6, 21, 0.92));
+  text-align: center;
+}
+
+.astral-halo {
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 140px;
+  background: radial-gradient(circle, rgba(245, 215, 110, 0.22), transparent 68%);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.astral-board.is-settled .astral-halo {
+  animation: none;
+  opacity: 0.55;
+}
+
+.astral-kicker {
+  position: relative;
+  margin: 0 0 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.astral-quip {
+  position: relative;
+  margin: 0 auto 14px;
+  max-width: 36rem;
+  color: var(--ink);
+  font-style: italic;
+  min-height: 2.6em;
+}
+
+.astral-runes {
+  position: relative;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.astral-rune {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.astral-board.is-consulting .astral-rune {
+  animation: rune-glow 1.6s ease-in-out infinite;
+}
+
+.astral-board.is-consulting .astral-rune.r-1 { animation-delay: 0.2s; }
+.astral-board.is-consulting .astral-rune.r-2 { animation-delay: 0.4s; }
+.astral-board.is-consulting .astral-rune.r-3 { animation-delay: 0.6s; }
+
+.astral-board.is-settled .astral-rune {
+  color: var(--button-ink);
+  background: var(--button);
+  border-color: transparent;
+}
+
+@keyframes meter-hunt {
+  0%,
+  100% {
+    width: 10%;
+    filter: brightness(0.9);
+  }
+  50% {
+    width: 42%;
+    filter: brightness(1.25);
+  }
+}
+
+@keyframes rune-glow {
+  50% {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(245, 215, 110, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meter-fill,
+  .countdown-bar,
+  .astral-halo,
+  .casting-ring,
+  .casting-glyph,
+  .casting-core,
+  .spark {
+    animation: none !important;
+    transition: none !important;
   }
 }
