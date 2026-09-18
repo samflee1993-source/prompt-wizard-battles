@@ -13,10 +13,12 @@ export const RIVAL = {
   name: "Synergy the Soft-Committed",
   shortName: "Synergy",
   tagline: "Joined via calendar hold. Still aligning on the prompt.",
-  /** Canned still — not from a second prompt. Swap for /duel/pool/* when those land. */
-  mockOutUrl: "/duel/stub-out-b.svg",
-  /** Hidden scoring prompt so the rival can still beat a weak ship. */
-  mockSpell: CANNED_PACK.hintMethod,
+  /** Strong-ish canned still from /public/duel/pool — not from a second prompt. */
+  mockOutUrl: "/duel/pool/rival-mock.png",
+  mockOutFallbackUrl: CANNED_PACK.stubOutB,
+  /** Hidden scoring prompt matching the after-02 / strong-ish still. */
+  mockSpell:
+    "Turn this sleepy cottage into a tall crystal wizard spire at twilight, glowing stained glass, northern lights, rainbow prism rays.",
 } as const;
 
 export const SPELL_SECONDS = 90;

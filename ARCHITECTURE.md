@@ -13,7 +13,7 @@ Happy path once is enough. No deep QA.
 - Opponent is a pretend rival, not a second player: **Synergy the Soft-Committed** (orange corporate salamander, standup sticky as staff). Name + avatar only — no Wizard B inputs / second spell field.
 - Same **before** media + **riddle** (hints at prompt method behind real **after**).
 - Nova submits **one spell** on a **90-second countdown**; auto-cast at 0 or Cast on submit, whichever first.
-- Nova’s gen is stubbed; Synergy’s compare image is a **canned mock** (`stub-out-b.svg` until `/public/duel/pool/` stills exist). Not from a second prompt.
+- Nova’s gen is stubbed (`stub-out-a.svg`). Synergy’s compare image is a **canned mock** at `/duel/pool/rival-mock.png` (SVG `stub-out-b.svg` fallback). Not from a second prompt.
 - Score = **50% deterministic** match-to-after + **50% personality LLM-judge** rubric (stub judge; no live LLM). Winner can still be Nova or Synergy from scores.
 - Announce winning wizard + short spicy SaaSy congrats.
 - Out of scope: brand system, CI matrices, features beyond this loop.
@@ -24,7 +24,7 @@ Happy path once is enough. No deep QA.
 |-------|--------|-----|
 | App | Next.js 15 App Router (TypeScript) | Fast to host; API routes for gen/judge stubs |
 | Host | Vercel free tier from GitHub | Public URL without paid APIs for stubs |
-| Media | Approved landing PNGs in `/public/landing/` + canned duel SVGs | Swap gen/judge later |
+| Media | Approved landing PNGs + duel before/after/rival-mock stills (SVG stubs as fallback) | Swap gen/judge later |
 | State | Client step machine + one duel session id | No DB for POC |
 
 Repo: `samflee1993-source/prompt-wizard-battles`.
@@ -50,7 +50,7 @@ Repo: `samflee1993-source/prompt-wizard-battles`.
     duel/                   # canned duel pack, session type, congrats, wizard roster
   public/
     landing/                # approved banners + index.html + HANDOFF.md
-    duel/                   # before.svg, after.svg, stub-out-a.svg, stub-out-b.svg (rival mock)
+    duel/                   # before.png, after.png, SVG stubs, pool/rival-mock.png
 ```
 
 ## UI flow (steps)
@@ -125,7 +125,7 @@ export interface JudgeProvider {
 }
 ```
 
-**Stub gen:** ignore spell semantics; return canned `stub-out-a.svg` after a short delay for Nova only. Synergy’s reveal image is the canned rival mock (`stub-out-b.svg`), not a second `/api/cast`.  
+**Stub gen:** ignore spell semantics; return canned `stub-out-a.svg` after a short delay for Nova only. Synergy’s reveal image is `/duel/pool/rival-mock.png` (strong-ish canned still; SVG fallback), not a second `/api/cast`.  
 **Stub judge:** persona “Archmage Snark” (overridable via `JUDGE_PERSONA`); hash prompt+urls into stable 0–100 rubric buckets (theatricality, cunning, resemblance, panache) + witty one-liner. No live LLM.  
 **Deterministic:** lexical overlap of the wizard’s spell against `pack.targetKeywords` (the hidden prompt-method the riddle hints at), mapped to ~14–98. Pure function in `lib/score/deterministic.ts`. Pixel/histogram distance was skipped because placeholder SVGs would barely move the score with user input.
 
@@ -156,7 +156,7 @@ Never commit `.env`. Empty `.env.example` lists the keys above. Unwired non-stub
 | Piece | POC | Real later |
 |-------|-----|------------|
 | Landing visuals | Approved banners (`hero-v1` … `cta-v1`, `learn-fun-v2`) | Optional HTML typography instead of image copy |
-| Before / after / stub outs | Static SVG in `/public/duel` | Real pack assets / CDN |
+| Before / after / stub outs | `before.png` / `after.png` / `pool/rival-mock.png`; SVG stubs fallback | Real pack assets / CDN |
 | Image gen | `StubImageGen` | Provider behind `ImageGenProvider` |
 | Judge | `StubPersonalityJudge` + theatrical astral-board animation | LLM + rubric agent |
 | Deterministic score | Lexical overlap vs target keywords | Embedding / perceptual metric |

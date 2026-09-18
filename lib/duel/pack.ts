@@ -2,7 +2,9 @@ export type DuelPack = {
   id: string;
   title: string;
   beforeUrl: string;
+  beforeFallbackUrl: string;
   afterUrl: string;
+  afterFallbackUrl: string;
   riddle: string;
   hintMethod: string;
   targetKeywords: string[];
@@ -10,12 +12,14 @@ export type DuelPack = {
   stubOutB: string;
 };
 
-/** Canned happy-path pack. Static placeholders in /public/duel. */
+/** Canned happy-path pack. PNG stills preferred; SVG stubs are fallback. */
 export const CANNED_PACK: DuelPack = {
   id: "cottage-to-spire",
   title: "The Hearth That Learned to Sing",
-  beforeUrl: "/duel/before.svg",
-  afterUrl: "/duel/after.svg",
+  beforeUrl: "/duel/before.png",
+  beforeFallbackUrl: "/duel/before.svg",
+  afterUrl: "/duel/after.png",
+  afterFallbackUrl: "/duel/after.svg",
   riddle:
     "Timber dreamed of starlight. The hearth grew a crown of glass. What craft raised a singing spire from a sleepy cottage?",
   hintMethod:

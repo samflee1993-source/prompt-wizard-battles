@@ -242,6 +242,7 @@ export function DuelClient() {
           <div className="brief-grid">
             <MediaFrame
               src={pack.beforeUrl}
+              fallbackSrc={pack.beforeFallbackUrl}
               alt="Before: a sleepy thatched cottage on a hill"
               caption="Before"
               tone="plain"
@@ -385,18 +386,21 @@ export function DuelClient() {
           <div className="reveal-grid">
             <MediaFrame
               src={session.outputs.a}
+              fallbackSrc={pack.stubOutA}
               alt={`${PLAYER.name} generated output`}
               caption={PLAYER.name}
               tone="a"
             />
             <MediaFrame
               src={pack.afterUrl}
+              fallbackSrc={pack.afterFallbackUrl}
               alt="True after image"
               caption="True after"
               tone="true"
             />
             <MediaFrame
               src={session.outputs.b}
+              fallbackSrc={RIVAL.mockOutFallbackUrl}
               alt={`${RIVAL.name} mock rival creation`}
               caption={`${RIVAL.name} · mock`}
               tone="b"
