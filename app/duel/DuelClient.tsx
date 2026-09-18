@@ -20,6 +20,7 @@ import {
   EMPTY_SPELL_FALLBACK,
   PLAYER,
   RIVAL,
+  RIVAL_CAST_SECONDS,
   SPELL_SECONDS,
 } from "@/lib/duel/wizards";
 
@@ -64,6 +65,7 @@ export function DuelClient() {
   );
   const [spellA, setSpellA] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(SPELL_SECONDS);
+  const [rivalMoved, setRivalMoved] = useState(false);
   const [session, setSession] = useState<DuelSession | null>(null);
   const [judgeDetail, setJudgeDetail] = useState<JudgeDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -143,6 +145,17 @@ export function DuelClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
+  useEffect(() => {
+    if (step !== "spells") {
+      setRivalMoved(false);
+      return;
+    }
+    const id = window.setTimeout(() => {
+      setRivalMoved(true);
+    }, RIVAL_CAST_SECONDS * 1000);
+    return () => window.clearTimeout(id);
+  }, [step]);
+
   function onSubmit(event: FormEvent) {
     event.preventDefault();
     void runCast("submit");
@@ -152,6 +165,7 @@ export function DuelClient() {
     busyRef.current = false;
     setSpellA("");
     setSecondsLeft(SPELL_SECONDS);
+    setRivalMoved(false);
     setSession(null);
     setJudgeDetail(null);
     setError(null);
@@ -235,8 +249,9 @@ export function DuelClient() {
             <h2>Get the riddle</h2>
             <p className="lede">
               You are {PLAYER.name}. {RIVAL.name} is already on the invite —
-              name and face only, no second prompt. Watch the before, then
-              ship one spell before the clock does it for you.
+              name and face only, no second prompt. Study the before and the
+              target after, keep the riddle, then ship one spell that recreates
+              it before the clock does it for you.
             </p>
           </div>
           <div className="brief-grid">
@@ -247,11 +262,18 @@ export function DuelClient() {
               caption="Before"
               tone="plain"
             />
-            <blockquote className="riddle">
-              <p>{pack.riddle}</p>
-              <footer>Shared riddle · hints at the true after</footer>
-            </blockquote>
+            <MediaFrame
+              src={pack.afterUrl}
+              fallbackSrc={pack.afterFallbackUrl}
+              alt="Target after: the true transformation to recreate"
+              caption="Target after"
+              tone="true"
+            />
           </div>
+          <blockquote className="riddle brief-riddle">
+            <p>{pack.riddle}</p>
+            <footer>Shared riddle · hints at the true after</footer>
+          </blockquote>
           <div className="actions">
             <button
               type="button"
@@ -269,9 +291,9 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>Cast your prompt</h2>
             <p className="lede">
-              Ninety seconds. Cast when you are ready — or the circle auto-casts
-              at zero. Do not peek at the after. {RIVAL.shortName} is not
-              taking notes from you.
+              Ninety seconds. Recreate the target after with one spell — or the
+              circle auto-casts at zero. {RIVAL.shortName} is not taking notes
+              from you.
             </p>
           </div>
           <div
@@ -326,7 +348,9 @@ export function DuelClient() {
                   </p>
                 </div>
               </label>
-              <aside className="spell-card tone-b rival-card">
+              <aside
+                className={`spell-card tone-b rival-card ${rivalMoved ? "is-moved" : "is-casting"}`}
+              >
                 <span className="wizard-chip">
                   <WizardPortrait who="b" size="sm" />
                   <span>
@@ -335,11 +359,19 @@ export function DuelClient() {
                   </span>
                 </span>
                 <div className="rival-seal" aria-hidden>
-                  <span className="wax-seal">HOLD</span>
+                  <span className="wax-seal">
+                    {rivalMoved ? "SENT" : "HOLD"}
+                  </span>
                 </div>
+                <p className="rival-status" role="status" aria-live="polite">
+                  {rivalMoved
+                    ? "Your foe hath made their move."
+                    : "Synergy is still casting…"}
+                </p>
                 <p className="rival-lock">
-                  Sealed calendar hold. No second prompt, no input, no “quick
-                  sync.” The salamander is aligning offline on a canned mock.
+                  {rivalMoved
+                    ? "The calendar hold just pinged done. Canned mock is locked — still no second prompt, still no input."
+                    : "Player 2 still casting on a calendar hold. No input, no quick sync, still aligning offline."}
                 </p>
               </aside>
             </div>
@@ -376,28 +408,41 @@ export function DuelClient() {
           <div className="panel-head">
             <h2>Cast. Wait. Compare.</h2>
             <p className="lede">
-              {PLAYER.shortName}’s stub gen · true after · {RIVAL.shortName}’s
-              canned mock (not from a second prompt).
+              Professor’s before and target after (same stills as briefing), then{" "}
+              {PLAYER.shortName}’s transformation, then {RIVAL.shortName}’s
+              canned mock — not a second prompt.
             </p>
             <div className="badge-row">
               {session.stubs.gen ? <StubBadge kind="gen" /> : null}
             </div>
           </div>
-          <div className="reveal-grid">
+          <div className="reveal-stack">
+            <p className="reveal-label">Professor’s before &amp; target after</p>
+            <div className="reveal-truth">
+              <MediaFrame
+                src={pack.beforeUrl}
+                fallbackSrc={pack.beforeFallbackUrl}
+                alt="Before: a sleepy thatched cottage on a hill"
+                caption="Before"
+                tone="plain"
+              />
+              <MediaFrame
+                src={pack.afterUrl}
+                fallbackSrc={pack.afterFallbackUrl}
+                alt="Target after: the true transformation to recreate"
+                caption="Target after"
+                tone="true"
+              />
+            </div>
+            <p className="reveal-label">{PLAYER.name}’s transformation</p>
             <MediaFrame
               src={session.outputs.a}
               fallbackSrc={pack.stubOutA}
               alt={`${PLAYER.name} generated output`}
-              caption={PLAYER.name}
+              caption={`${PLAYER.name} · transformation`}
               tone="a"
             />
-            <MediaFrame
-              src={pack.afterUrl}
-              fallbackSrc={pack.afterFallbackUrl}
-              alt="True after image"
-              caption="True after"
-              tone="true"
-            />
+            <p className="reveal-label">{RIVAL.name}’s generated image</p>
             <MediaFrame
               src={session.outputs.b}
               fallbackSrc={RIVAL.mockOutFallbackUrl}
