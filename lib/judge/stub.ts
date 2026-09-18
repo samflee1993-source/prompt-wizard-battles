@@ -10,7 +10,8 @@ function fnv(s: string): number {
 }
 
 function bucket(n: number, min: number, max: number): number {
-  return min + (n % (max - min + 1));
+  const span = max - min + 1;
+  return min + ((n >>> 0) % span);
 }
 
 const QUIPS = [
@@ -49,9 +50,9 @@ export class StubPersonalityJudge implements JudgeProvider {
       const key = `${spell}|${outUrl}|${input.afterUrl}|${input.riddle}|${salt}`;
       const h = fnv(key);
       const theatricality = bucket(h, 40, 96);
-      const cunning = bucket(h >> 3, 32, 94);
-      const resemblance = bucket(h >> 7, 28, 90);
-      const panache = bucket(h >> 11, 45, 99);
+      const cunning = bucket(h >>> 3, 32, 94);
+      const resemblance = bucket(h >>> 7, 28, 90);
+      const panache = bucket(h >>> 11, 45, 99);
       const score = Math.round(
         theatricality * 0.25 +
           cunning * 0.25 +
